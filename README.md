@@ -1,6 +1,6 @@
 # Gotchi
 
-Gotchi, a tamogotchi inspired game in the browser.
+Gotchi, a tamagotchi inspired game in the browser.
 
 ## Authors
 
