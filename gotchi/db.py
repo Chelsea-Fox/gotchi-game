@@ -22,11 +22,8 @@ def get_db():
 
     return g.db
 
-def close_db(e=None):
+def close_db():
     """Close the database connection.
-
-    Args:
-        e (_type_, optional): _description_. Defaults to None.
     """
     db = g.pop('db', None)
 

@@ -3,12 +3,12 @@
 """
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, render_template#, request, url_for, flash, g, redirect
 )
-from werkzeug.exceptions import abort
+#from werkzeug.exceptions import abort
 
-from gotchi.auth import login_required
-from gotchi.db import get_db
+#from gotchi.auth import login_required
+#from gotchi.db import get_db
 
 bp = Blueprint('home', __name__)
 
