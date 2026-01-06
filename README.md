@@ -1,3 +1,4 @@
+[![Pylint](https://github.com/Chelsea-Fox/gotchi-game/actions/workflows/pylint.yml/badge.svg)](https://github.com/Chelsea-Fox/gotchi-game/actions/workflows/pylint.yml)
 # Gotchi
 
 Gotchi, a tamagotchi inspired game in the browser.
