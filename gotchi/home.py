@@ -2,13 +2,9 @@
 """home blueprint for the main, non gameplay pages.
 """
 
-from flask import (
-    Blueprint, render_template#, request, url_for, flash, g, redirect
-)
-#from werkzeug.exceptions import abort
-
-#from gotchi.auth import login_required
-#from gotchi.db import get_db
+from flask import Blueprint, render_template
+from gotchi.db import get_db
+from gotchi.gameplay_functions import leaderboard
 
 bp = Blueprint('home', __name__)
 
@@ -16,4 +12,6 @@ bp = Blueprint('home', __name__)
 def index():
     """Home page route.
     """
-    return render_template('home/index.html')
+    db = get_db()
+
+    return render_template('home/index.html', leaderboard=leaderboard(db))
