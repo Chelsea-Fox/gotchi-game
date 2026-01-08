@@ -7,6 +7,7 @@ from datetime import datetime
 import click
 from flask import current_app, g
 
+
 def get_db():
     """Get a database connection.
 
@@ -22,13 +23,15 @@ def get_db():
 
     return g.db
 
-def close_db(e = None):
+
+def close_db(e=None):
     """Close the database connection.
     """
     db = g.pop('db', None)
 
     if db is not None:
         db.close()
+
 
 def init_db():
     """Clear and initialize the database using the schema
@@ -50,6 +53,7 @@ def init_db_command():
 sqlite3.register_converter(
     "timestamp", lambda v: datetime.fromisoformat(v.decode())
 )
+
 
 def init_app(app):
     """Register database functions with the Flask app.

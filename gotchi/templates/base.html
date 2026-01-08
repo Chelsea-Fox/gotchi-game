@@ -22,8 +22,8 @@
                   {{ g.user['username'] }}
                 </summary>
                 <ul style="width: fit-content;" dir="rtl">
-                  <li><a href="{{ url_for('auth.delete_account') }}">Delete Account</a></li>
                   <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                  <li><a href="{{ url_for('auth.delete_account') }}" style="color: #AF291D;">Delete Account</a></li>
                 </ul>
             </details>
           </li>

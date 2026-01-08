@@ -9,6 +9,7 @@ from gotchi.gameplay_functions import calculate_age, format_age, verify_gotchi_o
 
 bp = Blueprint('game', __name__)
 
+
 @login_required
 @bp.route('/gotchis')
 def gotchi_list():
@@ -29,6 +30,7 @@ def gotchi_list():
         entry['age'] = format_age(calculate_age(entry['birthdate']))
 
     return render_template('game/index.html', gotchi_list=modified_gotchi_list)
+
 
 @login_required
 @bp.route('/new', methods=('GET', 'POST'))
@@ -58,6 +60,7 @@ def new_gotchi():
     ).fetchone()['id']
 
     return redirect(url_for("game.play", gotchi_id=gotchi_id))
+
 
 @login_required
 @bp.route('/delete/<int:gotchi_id>', methods=('GET', 'POST'))

@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 
 from gotchi.db import get_db
 
+
 def calculate_age(birthdate, deathdate=None):
     """Calculate age in years, months, and days from birthdate.
 
@@ -31,9 +32,10 @@ def calculate_age(birthdate, deathdate=None):
 
     return delta
 
+
 def format_age(delta):
     """Format age from relativedelta into a human-readable string.
-    
+
     Args:
         delta (relativedelta): Age difference as a relativedelta object.
     Returns:
@@ -51,6 +53,7 @@ def format_age(delta):
         return f"{delta.minutes} minutes"
 
     return "Just born!"
+
 
 def leaderboard():
     """Retrieve the leaderboard of Gotchis based on oldest Gotchis.
@@ -71,13 +74,16 @@ def leaderboard():
     for entry in leaderboard_list:
         entry['gotchi_age'] = calculate_age(entry['gotchi_birthdate'])
 
-    modified_leaderboard = sorted(leaderboard_list, key=lambda x: (x['gotchi_age'].years, x['gotchi_age'].months, x['gotchi_age'].days), reverse=True)
+    modified_leaderboard = sorted(leaderboard_list, key=lambda x: (
+        x['gotchi_age'].years, x['gotchi_age'].months, x['gotchi_age'].days), reverse=True)
 
     for entry in modified_leaderboard[:10]:
-        entry['gotchi_age'] = format_age(calculate_age(entry['gotchi_birthdate']))
+        entry['gotchi_age'] = format_age(
+            calculate_age(entry['gotchi_birthdate']))
         entry['rank'] = modified_leaderboard.index(entry) + 1
 
     return modified_leaderboard
+
 
 def verify_gotchi_owner(gotchi_id, user_id):
     """Verify if a user is the owner of a Gotchi.

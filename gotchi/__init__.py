@@ -9,6 +9,7 @@ from gotchi.background_tasks.task_manager import TaskManager
 
 from . import db, auth, home, game
 
+
 def create_app(test_config=None):
     """Create and configure the Flask application.
 

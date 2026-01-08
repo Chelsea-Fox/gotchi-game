@@ -8,6 +8,7 @@ from gotchi.db import get_db
 
 bp = Blueprint('home', __name__)
 
+
 @bp.route('/')
 def index():
     """Home page route.
