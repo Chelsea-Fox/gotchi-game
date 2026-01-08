@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Your Gotchis
+{% endblock %}
+
+{% block content %}
+    {% if gotchi_list %}
+    <a href="{{ url_for('game.new_gotchi') }}">Create a new Gotchi</a>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Actions</th>
+        </tr>
+        {% for gotchi in gotchi_list %}
+        <tr>
+            <td>{{ gotchi.name }}</td>
+            <td>{{ gotchi.age }}</td>
+            <td>
+                <a href="">View</a> | <a href="{{ url_for('game.delete_gotchi', gotchi_id=gotchi.id) }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>You have no Gotchis yet. <a href="{{ url_for('game.new_gotchi') }}">Create one!</a></p>
+    {% endif %}
+{% endblock %}

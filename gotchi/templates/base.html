@@ -9,28 +9,38 @@
     <link rel="stylesheet" href="https://cdn.foxtrt.com/data/css/pico.min.css">
     <link rel="stylesheet" href="https://cdn.foxtrt.com/data/css/foxtrt.pico.css">
 </head>
-<main class="container">
-  <header>
-    <nav>
-      <a style="text-decoration: none;" href="{{ url_for('home.index') }}"><h1>Gotchi</h1></a>
-      <ul>
-        {% if g.user %}
-          <li><span>{{ g.user['username'] }}</span>
-          <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
-        {% else %}
-          <li><a href="{{ url_for('auth.register') }}">Register</a>
-          <li><a href="{{ url_for('auth.login') }}">Log In</a>
-        {% endif %}
-      </ul>
-    </nav>
-    <h3>{% block title %}{% endblock %}</h3>
-  </header>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
-</section>
-
-<footer class="container">
-  <p><small>Copyright © 2026 <a href="https://foxtrt.com">Foxtrt.com</a></small></p>
-</footer>
+<body>
+  <main class="container" style="height: 100vh;">
+    <header>
+      <nav>
+        <a style="text-decoration: none;" href="{{ url_for('home.index') }}"><h1>Gotchi</h1></a>
+        <ul>
+          {% if g.user %}
+          <li>
+            <details class="dropdown">
+                <summary role="button" class="outline secondary">
+                  {{ g.user['username'] }}
+                </summary>
+                <ul style="width: fit-content;" dir="rtl">
+                  <li><a href="{{ url_for('auth.delete_account') }}">Delete Account</a></li>
+                  <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                </ul>
+            </details>
+          </li>
+          {% else %}
+            <li><a href="{{ url_for('auth.register') }}">Register</a>
+            <li><a href="{{ url_for('auth.login') }}">Log In</a>
+          {% endif %}
+        </ul>
+      </nav>
+      <h3>{% block title %}{% endblock %}</h3>
+    </header>
+    {% for message in get_flashed_messages() %}
+      <div class="flash" style="color: #AF291D;">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="container" style="position: relative; height: 72px; margin-top: -72px;">
+    <p><small>Copyright © 2026 <a href="https://foxtrt.com">Foxtrt.com</a></small></p>
+  </footer>
+</body>

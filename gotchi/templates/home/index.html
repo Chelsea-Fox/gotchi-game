@@ -7,17 +7,23 @@
 {% block content %}
   {% if not g.user %}
   <p>Welcome to Gotchi!</p>
-  <p><a href="{{ url_for('auth.login') }}">Log in</a> or <a href="{{ url_for('auth.register') }}">Sign up</a> to start playing!</p>
+  <p><a href="{{ url_for('auth.login') }}">Log in</a> or <a href="{{ url_for('auth.register') }}">Register</a> to start playing!</p>
   {% else %}
   <p>Welcome back, {{ g.user.username }}!</p>
+  {% if has_gotchis %}
+    <a href="{{ url_for('game.gotchi_list') }}">Your Gotchis</a>
+  {% else %}
+    <p>You don't have any Gotchis yet. <a href="{{ url_for('game.new_gotchi') }}">Create a Gotchi!</a></p>
+  {% endif %}
+  
   {% endif %}
   <h2>Leaderboard</h2>
   <table>
     <tr>
       <th>Rank</th>
       <th>User</th>
-      <th>Gotchi</th>
-      <th>Gotchi Age</th>
+      <th>Name</th>
+      <th>Age</th>
     </tr>
     {% for user in leaderboard %}
     <tr>

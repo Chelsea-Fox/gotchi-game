@@ -37,7 +37,14 @@ def register():
             except db.IntegrityError:
                 error = "Username already in use."
             else:
-                return redirect(url_for("auth.login"))
+                user = db.execute(
+                    'SELECT * FROM Users WHERE username = ?', (username,)
+                ).fetchone()
+
+                session.clear()
+                session['user_id'] = user['id']
+
+                return redirect(url_for("home.index"))
 
         flash(error)
 
@@ -104,3 +111,29 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+
+@bp.route('/delete_account', methods=('GET', 'POST'))
+@login_required
+def delete_account():
+    """Route to delete a users account.
+    """
+    if request.method == 'POST':
+        password = request.form['password']
+        error = None
+        db = get_db()
+        user = db.execute(
+            'SELECT * FROM Users WHERE id = ?', (g.user['id'],)
+        ).fetchone()
+
+        if not check_password_hash(user['password'], password):
+            error = 'Incorrect password.'
+
+        if error is None:
+            db.execute('DELETE FROM Users WHERE id = ?', (g.user['id'],))
+            db.commit()
+            session.clear()
+            return redirect(url_for('index'))
+
+        flash(error)
+
+    return render_template('auth/delete_account.html')

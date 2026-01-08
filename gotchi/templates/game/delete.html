@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Delete Gotchi
+{% endblock %}
+
+{% block content %}
+    <p>Are you sure you want to delete your gotchi "{{ gotchi_name }}"? This action cannot be undone, and your gotchi will be lost forever.</p>
+    <form method="post" action="{{ url_for('game.delete_gotchi', gotchi_id=gotchi_id) }}">
+        <button type="submit">Delete "{{ gotchi_name }}"</button>
+    </form>
+    <form method="get" action="{{ url_for('game.gotchi_list') }}">
+      <button type="submit" class="secondary">Cancel</button>
+    </form>
+{% endblock %}
