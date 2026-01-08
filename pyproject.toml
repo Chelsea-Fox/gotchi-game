@@ -3,7 +3,7 @@ name = "gotchi"
 version = "1.0.0"
 description = "Web game inspired by tamogotchi games"
 dependencies = [
-    "flask",
+    "flask", "python-dateutil"
 ]
 
 [build-system]
