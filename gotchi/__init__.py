@@ -3,9 +3,11 @@
 """
 
 import os
+import sys
+from multiprocessing import Process
 from flask import Flask
 
-from gotchi.background_tasks.task_manager import TaskManager
+from gotchi.background_tasks.task_manager import task_loop
 
 from . import db, auth, home, game
 
@@ -47,14 +49,19 @@ def create_app(test_config=None):
 
     db.init_app(app)
 
-    task_manager = TaskManager()
-    task_manager.start_background_tasks()
-
     app.register_blueprint(auth.bp)
 
     app.register_blueprint(home.bp)
     app.add_url_rule('/', endpoint='index')
 
     app.register_blueprint(game.bp)
+
+    if "init-db" not in sys.argv:
+        with app.app_context():
+            task_manager = Process(target=task_loop(
+                app.app_context()), daemon=True)
+            task_manager.start()
+            if task_manager.is_alive():
+                print("Background task manager started", flush=True)
 
     return app

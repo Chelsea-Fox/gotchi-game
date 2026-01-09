@@ -2,27 +2,24 @@
 """Module to manage background tasks for the game.
 """
 
-import threading
-import atexit
+import time
 
-class TaskManager:
-    """Class to manage background tasks for the application."""
+from gotchi.background_tasks import hunger
 
-    threads = []
 
-    def __init__(self):
-        #TODO: Replace None with actual hunger management function
-        hunger_thread = threading.Thread(target=None)
-        self.threads.append(hunger_thread)
+def task_loop(app):
+    """Function to run the task loop (every minute) for background tasks."""
+    tasks = []
+    tasks.append(hunger.task)
 
-        atexit.register(self.stop_background_tasks)
+    while True:
+        print(
+            f"{time.strftime('%H:%M:%S')} : Task manager loop executing tasks...", flush=True)
+        for task in tasks:
+            print(
+                f"{time.strftime('%H:%M:%S')} : Executing task: {task.__module__}", flush=True)
+            status = task(app)
+            print(
+                f"{time.strftime('%H:%M:%S')} : Task executed with status: {status}", flush=True)
 
-    def start_background_tasks(self):
-        """Function to start background tasks for the application."""
-        for thread in self.threads:
-            thread.start()
-
-    def stop_background_tasks(self):
-        """Function to stop all background tasks gracefully."""
-        for thread in self.threads:
-            thread.join()
+        time.sleep(60)

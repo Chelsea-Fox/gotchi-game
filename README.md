@@ -16,7 +16,7 @@ Gotchi, a tamagotchi inspired game in the browser.
 ## Running Dev Environment
 
 - Init db `flask --app gotchi init-db`
-- Run `flask --app gotchi run --debug`
+- Run `flask --app gotchi run --debug --no-reload`
 - Test `pytest`
 - Test Coverage `coverage run -m pytest`
 - Coverage reports:
