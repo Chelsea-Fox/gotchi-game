@@ -3,12 +3,11 @@
 """
 
 import os
-import sys
-from multiprocessing import Process
+import atexit
+
 from flask import Flask
 
 from .extensions import scheduler
-
 from . import db, auth, home, game
 
 
@@ -22,16 +21,24 @@ def create_app(test_config=None):
         app (Flask): Flask application instance
     """
 
-    def is_debug_mode():
+    print(test_config, flush=True)
+
+    def is_debug_mode():  # pragma: no cover
         """Get app debug status."""
         debug = os.environ.get("FLASK_DEBUG")
         if not debug:
             return os.environ.get("FLASK_ENV") == "development"
         return debug.lower() not in ("0", "false", "no")
 
-    def is_werkzeug_reloader_process():
+    def is_werkzeug_reloader_process():  # pragma: no cover
         """Get werkzeug status."""
         return os.environ.get("WERKZEUG_RUN_MAIN") == "true"
+
+    @atexit.register
+    def at_shutdown():  # pragma: no cover
+        # Ensure scheduler is shutdown at exit
+        if scheduler.running:
+            scheduler.shutdown()
 
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
@@ -67,14 +74,18 @@ def create_app(test_config=None):
 
     app.register_blueprint(game.bp)
 
-    scheduler.init_app(app)
-    with app.app_context():
-        # If in debug mode, make sure to only run one process
-        if is_debug_mode() and not is_werkzeug_reloader_process():
+    with app.app_context():  # pragma: no cover
+        # If in debug mode, make sure to only run one process, and dont run when testing.
+        print(test_config, flush=True)
+        if is_debug_mode() and not is_werkzeug_reloader_process() and test_config is None:
             pass
         else:
-            from .background_tasks import hunger
+            if scheduler.app is None:
+                scheduler.init_app(app)
 
-            scheduler.start()
+            from .background_tasks import hunger  # noqa: C0415,W0611 pylint:disable=import-outside-toplevel,unused-import
+
+            if not scheduler.running:
+                scheduler.start()
 
     return app

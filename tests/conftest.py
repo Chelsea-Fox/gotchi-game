@@ -32,11 +32,13 @@ def app():
     os.close(db_fd)
     os.unlink(db_path)
 
+
 @pytest.fixture
 def client(app):
     """A test client for the app.
     """
     return app.test_client()
+
 
 @pytest.fixture
 def runner(app):
@@ -44,9 +46,11 @@ def runner(app):
     """
     return app.test_cli_runner()
 
+
 class AuthActions(object):
     """Helper for authentication actions in tests.
     """
+
     def __init__(self, client):
         self._client = client
 
@@ -62,6 +66,7 @@ class AuthActions(object):
         """Log out.
         """
         return self._client.get('/auth/logout')
+
 
 @pytest.fixture
 def auth(client):

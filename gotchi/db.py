@@ -24,7 +24,7 @@ def get_db():
     return g.db
 
 
-def close_db(e=None):
+def close_db(e=None):  # noqa: W0613 pylint:disable=unused-argument
     """Close the database connection.
     """
     db = g.pop('db', None)

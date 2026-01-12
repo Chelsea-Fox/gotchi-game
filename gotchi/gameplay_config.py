@@ -2,7 +2,7 @@
 """gameplay configuration settings for Gotchi.
 """
 
-GameplayConfig = {
+GAMEPLAY_CONFIG = {
     # HUNGER
     "starving_threshold": 0,  # Threshold to consider a Gotchi starving
     "hungry_threshold": 25,  # Threshold to consider a Gotchi hungry

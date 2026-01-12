@@ -6,6 +6,7 @@ import pytest
 from flask import g, session
 from gotchi.db import get_db
 
+
 def test_register(client, app):
     """Test user registration.
     """
@@ -13,7 +14,7 @@ def test_register(client, app):
     response = client.post(
         '/auth/register', data={'username': 'a', 'password': 'a'}
     )
-    assert response.headers["Location"] == "/auth/login"
+    assert response.headers["Location"] == "/"
 
     with app.app_context():
         assert get_db().execute(
@@ -35,6 +36,7 @@ def test_register_validate_input(client, username, password, message):
     )
     assert message in response.data
 
+
 def test_login(client, auth):
     """Test user login.
     """
@@ -47,6 +49,7 @@ def test_login(client, auth):
         assert session['user_id'] == 1
         assert g.user['username'] == 'test'
 
+
 @pytest.mark.parametrize(('username', 'password', 'message'), (
     ('a', 'test', b'Incorrect username.'),
     ('test', 'a', b'Incorrect password.'),
@@ -57,6 +60,7 @@ def test_login_validate_input(auth, username, password, message):
     response = auth.login(username, password)
     assert message in response.data
 
+
 def test_logout(client, auth):
     """Test user logout.
     """
@@ -65,3 +69,19 @@ def test_logout(client, auth):
     with client:
         auth.logout()
         assert 'user_id' not in session
+
+
+@pytest.mark.parametrize(('username', 'password', 'location'), (
+    (None, None, '/auth/login'),
+    ('test', 'test', '/auth/delete_account'),
+))
+def test_get_delete_account(client, auth, username, password, location):
+    """Test delete account page
+    """
+
+    if username:
+        auth.login(username, password)
+
+    response = client.get('/auth/delete_account')
+
+    assert response.headers["Location"] == location

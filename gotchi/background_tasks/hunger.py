@@ -4,7 +4,7 @@
 
 from gotchi.extensions import scheduler
 from gotchi.db import get_db
-from gotchi.gameplay_config import GameplayConfig
+from gotchi.gameplay_config import GAMEPLAY_CONFIG
 from gotchi.gameplay_functions import death_check_and_set
 
 
@@ -54,12 +54,12 @@ def hunger_decrementer():
                ' AND hunger > 0'
                ' AND ROUND((JULIANDAY(CURRENT_TIMESTAMP) - JULIANDAY(last_fed)) * 86400) >= ?',
                (
-                   GameplayConfig["hunger_decrease_amount"],
-                   GameplayConfig["hunger_decrease_amount"],
-                   GameplayConfig["starving_threshold"],
-                   GameplayConfig["hungry_threshold"],
-                   GameplayConfig["full_threshold"],
-                   GameplayConfig["hunger_decrease_interval_seconds"],
+                   GAMEPLAY_CONFIG["hunger_decrease_amount"],
+                   GAMEPLAY_CONFIG["hunger_decrease_amount"],
+                   GAMEPLAY_CONFIG["starving_threshold"],
+                   GAMEPLAY_CONFIG["hungry_threshold"],
+                   GAMEPLAY_CONFIG["full_threshold"],
+                   GAMEPLAY_CONFIG["hunger_decrease_interval_seconds"],
                ))
     db.commit()
 
@@ -78,8 +78,8 @@ def health_decrementer():
                ' WHERE deathdate IS NULL'
                ' AND hunger = ?',
                (
-                   GameplayConfig["health_decrease_when_starving"],
-                   GameplayConfig["health_decrease_when_starving"],
-                   GameplayConfig["starving_threshold"],
+                   GAMEPLAY_CONFIG["health_decrease_when_starving"],
+                   GAMEPLAY_CONFIG["health_decrease_when_starving"],
+                   GAMEPLAY_CONFIG["starving_threshold"],
                ))
     db.commit()
