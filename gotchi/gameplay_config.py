@@ -3,6 +3,7 @@
 """
 
 GameplayConfig = {
+    # HUNGER
     "starving_threshold": 0,  # Threshold to consider a Gotchi starving
     "hungry_threshold": 25,  # Threshold to consider a Gotchi hungry
     "full_threshold": 100,  # Threshold to consider a Gotchi full

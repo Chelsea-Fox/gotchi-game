@@ -7,7 +7,7 @@ import sys
 from multiprocessing import Process
 from flask import Flask
 
-from gotchi.background_tasks.task_manager import task_loop
+from .extensions import scheduler
 
 from . import db, auth, home, game
 
@@ -21,6 +21,17 @@ def create_app(test_config=None):
     Returns:
         app (Flask): Flask application instance
     """
+
+    def is_debug_mode():
+        """Get app debug status."""
+        debug = os.environ.get("FLASK_DEBUG")
+        if not debug:
+            return os.environ.get("FLASK_ENV") == "development"
+        return debug.lower() not in ("0", "false", "no")
+
+    def is_werkzeug_reloader_process():
+        """Get werkzeug status."""
+        return os.environ.get("WERKZEUG_RUN_MAIN") == "true"
 
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
@@ -56,12 +67,14 @@ def create_app(test_config=None):
 
     app.register_blueprint(game.bp)
 
-    if "init-db" not in sys.argv:
-        with app.app_context():
-            task_manager = Process(target=task_loop(
-                app.app_context()), daemon=True)
-            task_manager.start()
-            if task_manager.is_alive():
-                print("Background task manager started", flush=True)
+    scheduler.init_app(app)
+    with app.app_context():
+        # If in debug mode, make sure to only run one process
+        if is_debug_mode() and not is_werkzeug_reloader_process():
+            pass
+        else:
+            from .background_tasks import hunger
+
+            scheduler.start()
 
     return app

@@ -24,6 +24,7 @@
       <th>User</th>
       <th>Name</th>
       <th>Age</th>
+      <th>Alive/Dead?</th>
     </tr>
     {% for user in leaderboard %}
     <tr>
@@ -31,6 +32,7 @@
       <td>{{ user.username }}</td>
       <td>{{ user.gotchi_name }}</td>
       <td>{{ user.gotchi_age }}</td>
+      <td>{{ user.gotchi_alive_dead }}</td>
     </tr>
     {% endfor %}
   </table>

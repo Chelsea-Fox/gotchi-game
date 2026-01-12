@@ -61,7 +61,8 @@ def leaderboard():
     db = get_db()
 
     gotchi_list = db.execute(
-        'SELECT Users.username, Gotchis.birthdate as gotchi_birthdate, Gotchis.name AS gotchi_name'
+        'SELECT Users.username, Gotchis.birthdate as gotchi_birthdate, Gotchis.deathdate'
+        ' as gotchi_deathdate , Gotchis.name AS gotchi_name'
         ' FROM Gotchis'
         ' LEFT JOIN Users ON Users.id = Gotchis.owner_id'
         ' GROUP BY Users.id'
@@ -80,6 +81,7 @@ def leaderboard():
     for entry in modified_leaderboard[:10]:
         entry['gotchi_age'] = format_age(
             calculate_age(entry['gotchi_birthdate']))
+        entry['gotchi_alive_dead'] = 'Alive' if entry['gotchi_deathdate'] is None else 'Dead'
         entry['rank'] = modified_leaderboard.index(entry) + 1
 
     return modified_leaderboard
@@ -106,3 +108,15 @@ def verify_gotchi_owner(gotchi_id, user_id):
         return False
 
     return gotchi['owner_id'] == user_id
+
+
+def death_check_and_set():
+    """Checks if a Gotchi has died, and sets its deathdate accordingly.
+    """
+    db = get_db()
+
+    db.execute('UPDATE Gotchis SET'
+               ' deathdate = CURRENT_TIMESTAMP'
+               ' WHERE deathdate IS NULL'
+               ' AND health = 0')
+    db.commit()
