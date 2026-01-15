@@ -4,24 +4,31 @@
 
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
+from flask import Blueprint, g, redirect, request, url_for
 from gotchi.db import get_db
+from gotchi.auth import login_required
+from gotchi.gameplay_config import GAMEPLAY_CONFIG
 
 
-def calculate_age(birthdate, deathdate=None):
+bp = Blueprint('gameplay', __name__, url_prefix='/gameplay')
+
+
+def calculate_age(birthdate, deathdate=None, comparison_date=None):
     """Calculate age in years, months, and days from birthdate.
 
     Args:
         birthdate (datetime or string): The birthdate of the Gotchi.
         deathdate (datetime or string, optional): The deathdate of the Gotchi.
+        comparison_date (datetime, optional): overridable comparison date for testing.
     Returns:
         relativedelta: Age difference as a relativedelta object.
     """
-    comparison_date = datetime.now()
+
+    if not comparison_date:
+        comparison_date = datetime.now()
 
     if isinstance(birthdate, str):
         birthdate = datetime.fromisoformat(birthdate)
-        comparison_date = datetime.now()
 
     if deathdate:
         if isinstance(deathdate, str):
@@ -65,34 +72,42 @@ def leaderboard():
         ' as gotchi_deathdate , Gotchis.name AS gotchi_name'
         ' FROM Gotchis'
         ' LEFT JOIN Users ON Users.id = Gotchis.owner_id'
-        ' GROUP BY Users.id'
-        ' HAVING gotchi_birthdate IS NOT NULL'
-        ' ORDER BY Gotchis.birthdate ASC'
     ).fetchall()
 
     leaderboard_list = [dict(entry) for entry in gotchi_list]
 
     for entry in leaderboard_list:
-        entry['gotchi_age'] = calculate_age(entry['gotchi_birthdate'])
+        entry['gotchi_age'] = calculate_age(
+            entry['gotchi_birthdate'], entry['gotchi_deathdate'])
 
     modified_leaderboard = sorted(leaderboard_list, key=lambda x: (
-        x['gotchi_age'].years, x['gotchi_age'].months, x['gotchi_age'].days), reverse=True)
+        x['gotchi_age'].years, x['gotchi_age'].months, x['gotchi_age'].days,
+        x['gotchi_age'].hours, x['gotchi_age'].minutes, x['gotchi_age'].seconds), reverse=True)
 
-    for entry in modified_leaderboard[:10]:
-        entry['gotchi_age'] = format_age(
-            calculate_age(entry['gotchi_birthdate']))
+    for entry in modified_leaderboard:
+        entry['gotchi_age'] = format_age(entry['gotchi_age'])
         entry['gotchi_alive_dead'] = 'Alive' if entry['gotchi_deathdate'] is None else 'Dead'
         entry['rank'] = modified_leaderboard.index(entry) + 1
 
-    return modified_leaderboard
+    leaderboard_users = []
+    formatted_leaderboard = []
+    for entry in modified_leaderboard:
+        if len(formatted_leaderboard) == 10:
+            break
+
+        if entry['username'] not in leaderboard_users:
+            leaderboard_users.append(entry['username'])
+            formatted_leaderboard.append(entry)
+
+    return formatted_leaderboard
 
 
 def verify_gotchi_owner(gotchi_id, user_id):
     """Verify if a user is the owner of a Gotchi.
 
     Args:
-        gotchi_id (_type_): Gotchi ID to verify.
-        user_id (_type_): User ID to verify against.
+        gotchi_id (int): Gotchi ID to verify.
+        user_id (int): User ID to verify against.
 
     Returns:
         bool: Wether the user is the owner of the Gotchi.
@@ -119,4 +134,62 @@ def death_check_and_set():
                ' deathdate = CURRENT_TIMESTAMP'
                ' WHERE deathdate IS NULL'
                ' AND health = 0')
+    db.commit()
+
+
+@login_required
+@bp.route('/feed', methods=['POST'])
+def feed_gotchi():
+    """Feeds a gotchi by a set ammount.
+
+    Args:
+        gotchi_id (int): Gotchi ID to feed.
+    """
+    gotchi_id = request.form['gotchi_id']
+
+    if verify_gotchi_owner(gotchi_id, g.user['id']):
+        db = get_db()
+
+        db.execute(
+            'UPDATE Gotchis'
+            ' SET hunger = CASE WHEN hunger + ? > 100 THEN 100 ELSE hunger + ? END'
+            ' WHERE id = ?',
+            (
+                GAMEPLAY_CONFIG["hunger_increase_on_feed"],
+                GAMEPLAY_CONFIG["hunger_increase_on_feed"],
+                gotchi_id,
+            )
+        )
+        db.commit()
+
+    hunger_status_setter()
+
+    return redirect(url_for("game.play", gotchi_id=gotchi_id))
+
+
+def hunger_status_setter():
+    """
+    Manages the hunger status of Gotchis.
+    """
+
+    # If Hunger level is:
+    # <= starving_threshold: set status to "starving"
+    # <= hungry_threshold: set status to "hungry"
+    # > full_threshold: set status to "full"
+    # else: set status to "normal"
+    db = get_db()
+
+    db.execute('UPDATE Gotchis SET'
+               ' hunger_status = CASE'
+               ' WHEN hunger <= ? THEN "starving"'
+               ' WHEN hunger <= ? THEN "hungry"'
+               ' WHEN hunger >= ? THEN "full"'
+               ' ELSE "normal"'
+               ' END'
+               ' WHERE deathdate IS NULL',
+               (
+                   GAMEPLAY_CONFIG["starving_threshold"],
+                   GAMEPLAY_CONFIG["hungry_threshold"],
+                   GAMEPLAY_CONFIG["full_threshold"],
+               ))
     db.commit()

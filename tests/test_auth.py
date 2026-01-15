@@ -71,17 +71,38 @@ def test_logout(client, auth):
         assert 'user_id' not in session
 
 
-@pytest.mark.parametrize(('username', 'password', 'location'), (
-    (None, None, '/auth/login'),
-    ('test', 'test', '/auth/delete_account'),
+@pytest.mark.parametrize(('username', 'password'), (
+    (None, None),
+    ('test', 'test'),
 ))
-def test_get_delete_account(client, auth, username, password, location):
-    """Test delete account page
+def test_get_delete_account(client, auth, username, password):
+    """Test GET delete account page
     """
 
-    if username:
-        auth.login(username, password)
+    with client:
+        if username:
+            auth.login(username, password)
+            assert client.get('/auth/delete_account').status_code == 200
+        else:
+            assert client.get('/auth/delete_account').status_code == 302
 
-    response = client.get('/auth/delete_account')
 
-    assert response.headers["Location"] == location
+def test_post_delete_account(client, app, auth):
+    """Test POST delete account page
+    """
+
+    auth.login('test', 'test')
+
+    response = client.post(
+        '/auth/delete_account',
+        data={'password': 'notmypassword'}
+    )
+    assert b'Incorrect password.' in response.data
+
+    assert client.post('/auth/delete_account',
+                       data={'password': 'test'}).status_code == 302
+
+    with app.app_context():
+        assert get_db().execute(
+            "SELECT * FROM Users WHERE username = 'test'"
+        ).fetchone() is None

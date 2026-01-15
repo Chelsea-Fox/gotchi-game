@@ -8,7 +8,7 @@ import atexit
 from flask import Flask
 
 from .extensions import scheduler
-from . import db, auth, home, game
+from . import db, auth, home, game, gameplay_functions
 
 
 def create_app(test_config=None):
@@ -73,6 +73,7 @@ def create_app(test_config=None):
     app.add_url_rule('/', endpoint='index')
 
     app.register_blueprint(game.bp)
+    app.register_blueprint(gameplay_functions.bp)
 
     with app.app_context():  # pragma: no cover
         # If in debug mode, make sure to only run one process, and dont run when testing.

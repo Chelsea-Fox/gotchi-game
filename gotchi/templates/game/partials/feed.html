@@ -1,0 +1,4 @@
+<form method="post" action="{{ url_for('gameplay.feed_gotchi') }}">
+    <input hidden name="gotchi_id" id="gotchi_id" value="{{ gotchi.id }}">
+    <button type="submit">Feed</button>
+</form>

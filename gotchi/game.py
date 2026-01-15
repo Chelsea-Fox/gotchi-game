@@ -18,16 +18,20 @@ def gotchi_list():
     db = get_db()
 
     gotchis = db.execute(
-        'SELECT g.id, g.name, g.birthdate'
+        'SELECT g.id, g.name, g.birthdate, g.deathdate'
         ' FROM Gotchis g JOIN Users u ON g.owner_id = u.id'
-        ' WHERE u.id = ?'
-        ' ORDER BY g.birthdate DESC', (g.user['id'],)
+        ' WHERE u.id = ?', (g.user['id'],)
     ).fetchall()
 
     modified_gotchi_list = [dict(entry) for entry in gotchis]
 
     for entry in modified_gotchi_list:
-        entry['age'] = format_age(calculate_age(entry['birthdate']))
+        entry['age'] = format_age(calculate_age(
+            entry['birthdate'], entry['deathdate']))
+        entry['alive_dead'] = 'Alive' if entry['deathdate'] is None else 'Dead'
+
+    modified_gotchi_list = sorted(modified_gotchi_list, key=lambda x: (
+        x['alive_dead'], x['age']))
 
     return render_template('game/index.html', gotchi_list=modified_gotchi_list)
 
@@ -91,3 +95,23 @@ def delete_gotchi(gotchi_id):
     db.commit()
 
     return redirect(url_for("game.gotchi_list"))
+
+
+@login_required
+@bp.route('/play/<int:gotchi_id>')
+def play(gotchi_id):
+    """Route to play the game, with a specified gotchi.
+    """
+    if not verify_gotchi_owner(gotchi_id, g.user['id']):
+        error = "Gotchi does not belong to you."
+        flash(error)
+        return redirect(url_for("game.gotchi_list"))
+
+    db = get_db()
+
+    gotchi = db.execute(
+        'SELECT * FROM Gotchis WHERE id = ?',
+        (gotchi_id,)
+    ).fetchone()
+
+    return render_template('game/play.html', gotchi=gotchi)

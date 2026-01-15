@@ -11,14 +11,20 @@
         <tr>
             <th>Name</th>
             <th>Age</th>
+            <th>Alive/Dead?</th>
             <th>Actions</th>
         </tr>
         {% for gotchi in gotchi_list %}
         <tr>
             <td>{{ gotchi.name }}</td>
             <td>{{ gotchi.age }}</td>
+            <td>{{ gotchi.alive_dead }}</td>
             <td>
-                <a href="">View</a> | <a href="{{ url_for('game.delete_gotchi', gotchi_id=gotchi.id) }}">Delete</a>
+                {% if not gotchi.deathdate %}
+                    <a href="{{ url_for('game.play', gotchi_id=gotchi.id) }}">View</a>
+                    |
+                {% endif %}
+                <a href="{{ url_for('game.delete_gotchi', gotchi_id=gotchi.id) }}">Delete</a>
             </td>
         </tr>
         {% endfor %}

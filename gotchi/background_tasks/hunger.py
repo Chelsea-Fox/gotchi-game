@@ -5,7 +5,7 @@
 from gotchi.extensions import scheduler
 from gotchi.db import get_db
 from gotchi.gameplay_config import GAMEPLAY_CONFIG
-from gotchi.gameplay_functions import death_check_and_set
+from gotchi.gameplay_functions import death_check_and_set, hunger_status_setter
 
 
 @scheduler.task(
@@ -14,7 +14,7 @@ from gotchi.gameplay_functions import death_check_and_set
     seconds=60,
     max_instances=1,
 )
-def task():
+def task():  # pragma: no cover
     """Task manager for hunger tasks
     """
     print(f"{__name__} Started", flush=True)
@@ -34,34 +34,20 @@ def hunger_decrementer():
 
     # Lower hunger by hunger_decrease_amount (min of 0) if
     # last_fed is older than hunger_decrease_interval_minutes.
-    #
-    # If Hunger level is:
-    # <= starving_threshold: set status to "starving"
-    # <= hungry_threshold: set status to "hungry"
-    # > full_threshold: set status to "full"
-    # else: set status to "normal"
     db = get_db()
 
     db.execute('UPDATE Gotchis SET'
-               ' hunger = CASE WHEN hunger <= ? THEN 0 ELSE hunger - ? END,'
-               ' hunger_status = CASE'
-               ' WHEN hunger <= ? THEN "starving"'
-               ' WHEN hunger <= ? THEN "hungry"'
-               ' WHEN hunger >= ? THEN "full"'
-               ' ELSE "normal"'
-               ' END'
+               ' hunger = CASE WHEN hunger <= ? THEN 0 ELSE hunger - ? END'
                ' WHERE deathdate IS NULL'
-               ' AND hunger > 0'
                ' AND ROUND((JULIANDAY(CURRENT_TIMESTAMP) - JULIANDAY(last_fed)) * 86400) >= ?',
                (
                    GAMEPLAY_CONFIG["hunger_decrease_amount"],
                    GAMEPLAY_CONFIG["hunger_decrease_amount"],
-                   GAMEPLAY_CONFIG["starving_threshold"],
-                   GAMEPLAY_CONFIG["hungry_threshold"],
-                   GAMEPLAY_CONFIG["full_threshold"],
                    GAMEPLAY_CONFIG["hunger_decrease_interval_seconds"],
                ))
     db.commit()
+
+    hunger_status_setter()
 
 
 def health_decrementer():

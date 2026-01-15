@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<meta http-equiv="refresh" content="60">
+{% endblock %}
+
+{% block title %}
+{{ gotchi.name }}
+{% endblock %}
+
+{% block content %}
+{% include 'game/partials/stats.html' %}
+{% include 'game/partials/feed.html' %}
+{% endblock %}
