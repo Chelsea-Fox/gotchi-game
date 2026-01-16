@@ -7,6 +7,9 @@ Gotchi, a tamagotchi inspired game in the browser.
 
 - [@Chelsea-Fox](https://www.github.com/Chelsea-Fox)
 
+### Special Thanks:
+- [@DanFoster](https://github.com/danfoster) Help fixing issues with testing and code coverage actions.
+
 ## Tech Stack
 
 **Client:** HTML5, CSS, Javascript
