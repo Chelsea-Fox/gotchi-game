@@ -39,7 +39,7 @@ jobs:
         python -m pip install coverage pytest
     
     - name: Pytest
-      run: pytest
+      run: python -m pytest .
 
     - name: Coverage comment
       id: coverage_comment
