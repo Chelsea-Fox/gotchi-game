@@ -1,4 +1,6 @@
 [![Pylint](https://github.com/Chelsea-Fox/gotchi-game/actions/workflows/pylint.yml/badge.svg)](https://github.com/Chelsea-Fox/gotchi-game/actions/workflows/pylint.yml)
+[![Pytest](https://github.com/Chelsea-Fox/gotchi-game/actions/workflows/pytest.yml/badge.svg)](https://github.com/Chelsea-Fox/gotchi-game/actions/workflows/pytest.yml)
+[![Coverage badge](https://raw.githubusercontent.com/Chelsea-Fox/gotchi-game/python-coverage-comment-action-data/badge.svg)](https://htmlpreview.github.io/?https://github.com/Chelsea-Fox/gotchi-game/blob/python-coverage-comment-action-data/htmlcov/index.html)
 # Gotchi
 
 Gotchi, a tamagotchi inspired game in the browser.
