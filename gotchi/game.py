@@ -5,6 +5,7 @@
 from flask import Blueprint, flash, redirect, render_template, g, request, url_for
 from gotchi.db import get_db
 from gotchi.auth import login_required
+from gotchi.gameplay_config import GAMEPLAY_CONFIG
 from gotchi.gameplay_functions import calculate_age, format_age, verify_gotchi_owner
 
 bp = Blueprint('game', __name__)
@@ -51,8 +52,8 @@ def new_gotchi():
 
     # Insert the new gotchi
     db.execute(
-        'INSERT INTO Gotchis (name, owner_id)'
-        ' VALUES (?, ?)',
+        'INSERT INTO Gotchis (name, type, owner_id)'
+        ' VALUES (?, "fire_gotchi", ?)',
         (name, g.user['id'])
     )
     db.commit()
@@ -114,4 +115,7 @@ def play(gotchi_id):
         (gotchi_id,)
     ).fetchone()
 
-    return render_template('game/play.html', gotchi=gotchi)
+    sprite = (f"/static/gotchis/{gotchi["type"]}"
+              f"/{GAMEPLAY_CONFIG["sprite_stages"][gotchi["hunger_status"]]}.png")
+
+    return render_template('game/play.html', gotchi=gotchi, sprite=sprite)
