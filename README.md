@@ -9,11 +9,11 @@
 | gotchi/background\_tasks/hunger.py |       13 |        7 |        0 |        0 |     46% |37-50, 60-71 |
 | gotchi/db.py                       |       25 |        0 |        4 |        0 |    100% |           |
 | gotchi/extensions.py               |        2 |        0 |        0 |        0 |    100% |           |
-| gotchi/game.py                     |       51 |       34 |       10 |        0 |     28% |18-36, 44-66, 75-97, 105-117 |
+| gotchi/game.py                     |       53 |       35 |       10 |        0 |     29% |19-37, 45-67, 76-98, 106-121 |
 | gotchi/gameplay\_config.py         |        1 |        0 |        0 |        0 |    100% |           |
 | gotchi/gameplay\_functions.py      |       74 |       11 |       32 |        2 |     86% |96, 98->94, 148-167, 180-195 |
 | gotchi/home.py                     |       12 |        0 |        2 |        0 |    100% |           |
-| **TOTAL**                          |  **284** |   **52** |   **76** |    **2** | **82%** |           |
+| **TOTAL**                          |  **286** |   **53** |   **76** |    **2** | **81%** |           |
 
 
 ## Setup coverage badge
